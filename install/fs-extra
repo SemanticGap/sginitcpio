@@ -1,0 +1,19 @@
+#!/bin/sh
+
+build()
+{
+  add_module overlay
+  add_module ext4
+  add_module squashfs
+  add_module isofs
+  add_module exfat
+  add_module vfat
+  add_module reiserfs
+}
+
+help()
+{
+  cat <<EOF
+Adds more file system modules to the initrd.
+EOF
+}

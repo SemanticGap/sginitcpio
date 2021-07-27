@@ -1,0 +1,13 @@
+#!/bin/sh
+
+build()
+{
+  add_binary /usr/bin/busybox
+}
+
+help()
+{
+  cat <<EOF
+Adds a statically linked busybox.
+EOF
+}

@@ -1,0 +1,33 @@
+#!/bin/sh
+
+LIVECD_ROOT=/run/livecd
+
+block_devices()
+{
+	awk '/./ { print $4 }' < /proc/partitions
+}
+
+find_livecd()
+{
+	mkdir -p ${LIVECD_ROOT}
+
+	for dev in $(echo $1; block_devices); do
+		mount -o ro /dev/$dev ${LIVECD_ROOT} 2>/dev/null || continue
+		[ -e ${LIVECD_ROOT}/${livecd_file:-livecd.squashfs} ] && echo /dev/$dev && break
+		umount ${LIVECD_ROOT}
+	done
+}
+
+run_hook()
+{
+	[[ "${livecd}" == '' ]] && return 0
+	# find livecd device
+	local LIVECD_DEV="${livecd_device:-$(find_livecd "${livecd:-cdrom}")}"
+	[[ "${LIVECD_DEV}" == '' ]] && err "LiveCD not found." && return 1
+	# set file with root file system to root
+	msg "Found LiveCD on ${LIVECD_DEV}"
+	export root="${LIVECD_ROOT}/${livecd_file:-livecd.squashfs}"
+	# fall into overlay setup
+	export overlay_root="${overlay_root:-none}"
+	[[ "${overlay_root}" == 'none' ]] && export overlay_type="${overlay_type:-tmpfs}"
+}

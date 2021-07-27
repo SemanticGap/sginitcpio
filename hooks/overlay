@@ -1,0 +1,38 @@
+#!/bin/sh
+
+OVERLAY_MNT_ROOT="/run/overlay"
+
+is_overlay_root() {
+	if [ -b "${overlay_root}" ] || [[ "${overlay_root}" == 'none' ]]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+run_latehook() {
+	local MOUNT_OPTS
+	is_overlay_root || return 0
+
+	msg "Preparing overlay file system"
+
+	mkdir -p ${OVERLAY_MNT_ROOT}/rw ${OVERLAY_MNT_ROOT}/ro
+
+	#mount -oremount,rw /new_root
+	mount -omove /new_root ${OVERLAY_MNT_ROOT}/ro
+
+	if [[ "${overlay_root}" != 'none' ]]; then
+		msg "Checking overlay ${overlay_root}"
+		overlay_root="$(resolve_device "${overlay_root}")"
+		fsck_device "${overlay_root}"
+	fi
+
+	msg "Mounting overlay ${overlay_root}"
+	[[ "${overlay_options}" != '' ]] && MOUNT_OPTS="-o \"${overlay_options:-rw}\""
+	[[ "${overlay_type}" != '' ]] && MOUNT_OPTS="${MOUNT_OPTS} -t ${overlay_type}"
+	mount ${MOUNT_OPTS} "${overlay_root}" ${OVERLAY_MNT_ROOT}/rw
+	[ ! -d ${OVERLAY_MNT_ROOT}/rw/data ] && mkdir ${OVERLAY_MNT_ROOT}/rw/data
+	[ ! -d ${OVERLAY_MNT_ROOT}/rw/work ] && mkdir ${OVERLAY_MNT_ROOT}/rw/work
+
+	mount -t overlay none /new_root -o lowerdir=${OVERLAY_MNT_ROOT}/ro,upperdir=${OVERLAY_MNT_ROOT}/rw/data,workdir=${OVERLAY_MNT_ROOT}/rw/work
+}

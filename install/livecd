@@ -1,0 +1,23 @@
+#!/bin/sh
+
+build()
+{
+  add_module overlay
+  add_module squashfs
+  add_module isofs
+  add_runscript
+}
+
+help()
+{
+  cat <<EOF
+Mounts the first /livecd.squashfs it finds on a block device when livecd is set.
+
+Kernel arguments:
+  livecd      Hint to dirst devices to try like 'cdrom'.
+  livecd_file Name of file system image on disc.
+
+Changes \$overlay_root and \$overlay_type to a tmpfs if neither is set.
+Therefore, following with the "overlay" module is desired.
+EOF
+}

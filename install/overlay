@@ -1,0 +1,20 @@
+#!/bin/sh
+
+build()
+{
+  add_module overlay
+  add_module ext4
+  add_runscript
+}
+
+help()
+{
+  cat <<EOF
+Mounts an overlay root file system.
+
+Kernel cmdline arguments:
+  overlay_root    Device to mount overlaid on root. Must have any data under /data.
+  overlay_options Options for the mount.
+  overlay_type    File system of the overlay.
+EOF
+}
