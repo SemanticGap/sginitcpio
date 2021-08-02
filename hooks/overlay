@@ -36,3 +36,13 @@ run_latehook() {
 
 	mount -t overlay none /new_root -o lowerdir=${OVERLAY_MNT_ROOT}/ro,upperdir=${OVERLAY_MNT_ROOT}/rw/data,workdir=${OVERLAY_MNT_ROOT}/rw/work
 }
+
+run_shutdown()
+{
+	if grep -e '/run/overlay/r.' /proc/mounts > /dev/null; then
+		msg "Unmounting overlay file systems..."
+		umount /oldroot
+		umount /run/overlay/rw
+		umount /run/overlay/ro
+	fi
+}

@@ -1,0 +1,14 @@
+#!/bin/sh
+
+build()
+{
+  add_file /usr/lib/initcpio/shutdown-hooks /shutdown-hooks
+  add_runscript
+}
+
+help()
+{
+  cat <<EOF
+Swaps out the /shutdown script so `run_shutdown` gunctions in hooks can be ran first. Place it after the `shutdown` hook.
+EOF
+}

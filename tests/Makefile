@@ -1,7 +1,7 @@
 .PHONY: run all
 
 test.initrd:
-	sudo mkinitcpio -g test.initrd -A fs-extra -A livecd -A overlay -A shutdown -S autodetect
+	sudo mkinitcpio -g test.initrd -A fs-extra -A livecd -A overlay -A shutdown -A shutdown-hooks -S autodetect
 
 run:
 	qemu-system-x86_64 -kernel /boot/vmlinuz-linux -initrd test.initrd -append 'livecd=cdrom overlay_root=/dev/sda console=tty0,ttyS0' -vnc :1 -cdrom livecd.iso -hdb overlay.img -serial stdio -m 512
@@ -25,6 +25,10 @@ tmp/rootfs:
 	ln -s busybox tmp/rootfs/bin/poweroff
 	ln -s busybox tmp/rootfs/bin/reboot
 	ln -s busybox tmp/rootfs/bin/sh
+	ln -s busybox tmp/rootfs/bin/mount
+	ln -s busybox tmp/rootfs/bin/pivot_root
+	cp scripts/do-pivot.sh tmp/rootfs/do-pivot.sh
+	cp scripts/umount-overlay.sh tmp/rootfs/umount-overlay.sh
 
 overlay.img:
 	dd if=/dev/zero of=$@ bs=1M count=8

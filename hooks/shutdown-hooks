@@ -1,0 +1,9 @@
+#!/bin/sh
+
+run_hook()
+{
+  # setup /shutdown replacement
+  mv /shutdown /shutdown.orig
+  mv /shutdown-hooks /shutdown
+  chmod ugo+rx /shutdown
+}

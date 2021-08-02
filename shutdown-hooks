@@ -1,0 +1,7 @@
+#!/bin/sh
+
+. /init_functions
+. /config
+
+run_hookfunctions 'run_shutdown' 'shutdown hook' $EARLYHOOKS $HOOKS $LATEHOOKS $CLEANUPHOOKS
+exec /shutdown.orig $@
