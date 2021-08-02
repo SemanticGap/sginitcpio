@@ -3,7 +3,7 @@
 all: overlay.img livecd.iso
 
 test.initrd:
-	sudo mkinitcpio -g test.initrd -A fs-extra -A livecd -A overlay -A shutdown -A shutdown-hooks -S autodetect
+	sudo mkinitcpio -c mkinitcpio.conf -g test.initrd -S autodetect
 
 run:
 	qemu-system-x86_64 -kernel /boot/vmlinuz-linux -initrd test.initrd -append 'livecd=cdrom overlay_root=/dev/sda console=tty0,ttyS0' -vnc :1 -cdrom livecd.iso -hdb overlay.img -serial stdio -m 512
