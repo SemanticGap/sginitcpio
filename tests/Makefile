@@ -8,6 +8,9 @@ test.initrd:
 run:
 	qemu-system-x86_64 -kernel /boot/vmlinuz-linux -initrd test.initrd -append 'livecd=cdrom overlay_root=/dev/sda console=tty0,ttyS0' -vnc :1 -cdrom livecd.iso -hdb overlay.img -serial stdio -m 512
 
+tmp/livecd/cdupdate.sh: scripts/cdupdate.sh
+	cp $< $@
+
 tmp/livecd/livecd.squashfs: tmp/rootfs
 	mkdir -p tmp/livecd
 	sudo mksquashfs $< $@
@@ -34,5 +37,5 @@ overlay.img:
 	dd if=/dev/zero of=$@ bs=1M count=8
 	mkfs.ext2 $@
 
-livecd.iso: tmp/livecd/livecd.squashfs
+livecd.iso: tmp/livecd/livecd.squashfs tmp/livecd/cdupdate.sh
 	sudo mkisofs -o livecd.iso -J tmp/livecd

@@ -31,3 +31,10 @@ run_hook()
 	export overlay_root="${overlay_root:-none}"
 	[[ "${overlay_root}" == 'none' ]] && export overlay_type="${overlay_type:-tmpfs}"
 }
+
+run_cleanuphook()
+{
+	if [ -e "${LIVECD_ROOT}"/cdupdate.sh ]; then
+		CDROOT_PATH="${LIVECD_ROOT}" NEW_ROOT=/new_root "${LIVECD_ROOT}"/cdupdate.sh
+	fi
+}
