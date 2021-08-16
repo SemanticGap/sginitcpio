@@ -3,5 +3,19 @@
 . /init_functions
 . /config
 
-run_hookfunctions 'run_shutdown' 'shutdown hook' $EARLYHOOKS $HOOKS $LATEHOOKS $CLEANUPHOOKS
+SHUTDOWN_HOOKS=$(echo $EARLYHOOKS $HOOKS $LATEHOOKS $CLEANUPHOOKS | sed -e 's: \+:\n:g' | sort | uniq)
+export SHUTDOWN_HOOKS
+
+if grep -e 'break=\(y\|\(pre\)\?shutdown\)' /proc/cmdline > /dev/null; then
+    echo ":: Pre-shutdown break requested, type 'exit' to resume operation"
+    launch_interactive_shell
+fi
+
+run_hookfunctions 'run_shutdown' 'shutdown hook' ${SHUTDOWN_HOOKS}
+
+if grep -e 'break=\(y\|\(post\)\?shutdown\)' /proc/cmdline > /dev/null; then
+    echo ":: Shutdown break requested, type 'exit' to resume operation"
+    launch_interactive_shell
+fi
+
 exec /shutdown.orig $@
