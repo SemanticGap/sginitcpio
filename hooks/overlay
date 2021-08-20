@@ -3,15 +3,14 @@
 OVERLAY_MNT_ROOT="/run/overlay"
 
 is_overlay_root() {
-	if [ -b "${overlay_root}" ] || [[ "${overlay_root}" == 'none' ]]; then
-		return 0
-	else
+	if [[ "${overlay_root}" == "" ]]; then
 		return 1
+	else
+		return 0
 	fi
 }
 
 run_latehook() {
-	local MOUNT_OPTS
 	is_overlay_root || return 0
 
 	msg "Preparing overlay file system"
@@ -24,17 +23,24 @@ run_latehook() {
 	if [[ "${overlay_root}" != 'none' ]]; then
 		msg "Checking overlay ${overlay_root}"
 		overlay_root="$(resolve_device "${overlay_root}")"
-		fsck_device "${overlay_root}"
+		if ! fsck_device "${overlay_root}"; then
+			err "Failed to fsck overlay root: ${overlay_root}"
+			launch_interactive_shell --exec
+		fi
 	fi
 
 	msg "Mounting overlay ${overlay_root}"
-	[[ "${overlay_options}" != '' ]] && MOUNT_OPTS="-o \"${overlay_options:-rw}\""
-	[[ "${overlay_type}" != '' ]] && MOUNT_OPTS="${MOUNT_OPTS} -t ${overlay_type}"
-	mount ${MOUNT_OPTS} "${overlay_root}" ${OVERLAY_MNT_ROOT}/rw
+	if ! mount -t "${overlay_type:-auto}" -o "${overlay_options:-rw}" "${overlay_root}" ${OVERLAY_MNT_ROOT}/rw ; then
+		err "Failed to mount overlay root ${overlay_root}"
+		launch_interactive_shell --exec
+	fi
 	[ ! -d ${OVERLAY_MNT_ROOT}/rw/data ] && mkdir ${OVERLAY_MNT_ROOT}/rw/data
 	[ ! -d ${OVERLAY_MNT_ROOT}/rw/work ] && mkdir ${OVERLAY_MNT_ROOT}/rw/work
 
-	mount -t overlay none /new_root -o lowerdir=${OVERLAY_MNT_ROOT}/ro,upperdir=${OVERLAY_MNT_ROOT}/rw/data,workdir=${OVERLAY_MNT_ROOT}/rw/work
+	if ! mount -t overlay none /new_root -o lowerdir=${OVERLAY_MNT_ROOT}/ro,upperdir=${OVERLAY_MNT_ROOT}/rw/data,workdir=${OVERLAY_MNT_ROOT}/rw/work ; then
+		err "Overlay failed to mount."
+		launch_interactive_shell --exec
+	fi
 }
 
 run_shutdown()
