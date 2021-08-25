@@ -35,7 +35,7 @@ run_hook()
 run_cleanuphook()
 {
 	CDROOT_PATH=$(dirname "${root}")
-	if [ -e "${CDROOT_PATH}"/cdupdate.sh ]; then
+	if [ -e "${CDROOT_PATH}"/cdupdate.sh ] && [ ! -e "/new_root/.updated" ]; then
 		export CDROOT_PATH
 		export NEW_ROOT=/new_root
 		"${CDROOT_PATH}"/cdupdate.sh
