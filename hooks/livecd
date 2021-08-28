@@ -26,10 +26,11 @@ run_hook()
 	[[ "${LIVECD_DEV}" == '' ]] && err "LiveCD not found." && return 1
 	# set file with root file system to root
 	msg "Found LiveCD on ${LIVECD_DEV}"
+	[[ "${livecd_rw}" != "" ]] && mount -o remount,rw "${LIVECD_ROOT}"
 	export root="${LIVECD_ROOT}/${livecd_file:-livecd.squashfs}"
 	# fall into overlay setup
-	export overlay_root="${overlay_root:-none}"
-	[[ "${overlay_root}" == 'none' ]] && export overlay_type="${overlay_type:-tmpfs}"
+	export overlay_upper="${overlay_upper:-none}"
+	[[ "${overlay_upper}" == 'none' ]] && export overlay_upper_type="${overlay_upper_type:-tmpfs}"
 }
 
 run_cleanuphook()

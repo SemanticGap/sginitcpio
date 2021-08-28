@@ -16,6 +16,7 @@ Mounts the first /livecd.squashfs it finds on a block device when livecd is set.
 Kernel arguments:
   livecd      Hint to dirst devices to try like 'cdrom'.
   livecd_file Name of file system image on disc.
+  livecd_rw   Mount /run/livecd as RW
 
 Changes \$overlay_root and \$overlay_type to a tmpfs if neither is set.
 Therefore, following with the "overlay" module is desired.

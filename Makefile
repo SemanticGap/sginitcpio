@@ -9,7 +9,7 @@ clean:
 release:
 	mkdir -p release/$(NAME)
 	cp -r Makefile shutdown-hooks hooks install release/$(NAME)
-	tar cvfz release/$(NAME)-$(VERSION).tar.gz -C release $(NAME)
+	tar cvfz release/$(NAME)-$(VERSION).tar.gz --exclude-backups -C release $(NAME)
 
 install:
 	install -d $(DESTDIR)/usr/lib/initcpio
