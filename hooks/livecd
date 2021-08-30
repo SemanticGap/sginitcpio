@@ -9,9 +9,12 @@ block_devices()
 
 find_livecd()
 {
+	local DEV="$1"
+	[[ "${DEV}" == *=* ]] && DEV=$(resolve_device "${DEV}")
+	
 	mkdir -p ${LIVECD_ROOT}
 
-	for dev in $(echo $1; block_devices); do
+	for dev in $(echo $DEV; block_devices); do
 		mount -o ro /dev/$dev ${LIVECD_ROOT} 2>/dev/null || continue
 		[ -e ${LIVECD_ROOT}/${livecd_file:-livecd.squashfs} ] && echo /dev/$dev && break
 		umount ${LIVECD_ROOT}
