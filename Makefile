@@ -3,6 +3,8 @@ VERSION=0.1
 
 .PHONY: clean release install
 
+all: release
+
 clean:
 	rm -r release
 
