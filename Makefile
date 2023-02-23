@@ -1,5 +1,5 @@
 NAME=semgap-initcpio
-VERSION=0.1
+VERSION=0.2
 
 .PHONY: clean release install
 
@@ -10,7 +10,7 @@ clean:
 
 release:
 	mkdir -p release/$(NAME)
-	cp -r Makefile shutdown-hooks hooks install release/$(NAME)
+	cp -r Makefile etc shutdown-hooks hooks install release/$(NAME)
 	tar cvfz release/$(NAME)-$(VERSION).tar.gz --exclude-backups -C release $(NAME)
 
 install:
@@ -25,4 +25,7 @@ install:
 	install hooks/shutdown-hooks $(DESTDIR)/usr/lib/initcpio/hooks/shutdown-hooks
 	install install/shutdown-hooks $(DESTDIR)/usr/lib/initcpio/install/shutdown-hooks
 	install shutdown-hooks $(DESTDIR)/usr/lib/initcpio/shutdown-hooks
+	install -d $(DESTDIR)/etc/mkinitcpio.d
+	install etc/mkinitcpio.conf $(DESTDIR)/etc/mkinitcpio.conf.sg
+	install etc/mkinitcpio.d/linux.preset $(DESTDIR)/etc/mkinitcpio.d/sglinux.preset
 
