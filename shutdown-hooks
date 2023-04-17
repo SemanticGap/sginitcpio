@@ -1,7 +1,23 @@
-#!/bin/sh
+#!/bin/ash
 
 . /init_functions
 . /config
+
+run_hookfunctions() {
+    local hook fn=$1 desc=$2
+
+    shift 2
+    for hook in "$@"; do
+        [ -x "/hooks/$hook" ] || continue
+
+        unset -f "$fn" # needs -f to unset functions
+        . "/hooks/$hook"
+        type "$fn" >/dev/null || continue
+
+        msg ":: running $desc [$hook]"
+        "$fn"
+    done
+}
 
 SHUTDOWN_HOOKS=$(echo $EARLYHOOKS $HOOKS $LATEHOOKS $CLEANUPHOOKS | sed -e 's: \+:\n:g' | sort | uniq)
 export SHUTDOWN_HOOKS

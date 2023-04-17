@@ -9,6 +9,6 @@ build()
 help()
 {
   cat <<EOF
-Swaps out the /shutdown script so `run_shutdown` gunctions in hooks can be ran first. Place it after the `shutdown` hook.
+Swaps out the /shutdown script so `run_shutdown` functions in hooks can be ran first. Place it after the `shutdown` hook.
 EOF
 }
