@@ -46,6 +46,15 @@ run_latehook() {
 	fi
 }
 
+umount_tree()
+{
+  local DIR="$1"
+  for d in $(grep "${DIR}" /proc/mounts | cut -d ' ' -f 2 | sort -r); do
+    msg "Unmounting ${d}"
+    umount "${d}" || msg failed
+  done
+}
+
 run_shutdown()
 {
 	if grep -e '/run/overlay/r.' /proc/mounts > /dev/null; then
@@ -54,15 +63,7 @@ run_shutdown()
 		if ps | grep plymouth > /dev/null; then
 			plymouth quit
 		fi
-		mount --move /oldroot/run/livecd /run/livecd
-		mount --move /oldroot/sys /sys
-		mount --move /oldroot/dev /dev
-		#mount --move /oldroot/dev/pts /dev/pts
-		for dir in $(grep oldroot /proc/mounts | cut -d ' ' -f 2 | sort -r); do
-			msg "${dir}"
-			umount "${dir}" || msg failed
-		done
-		umount /run/overlay/rw
-		umount /run/overlay/ro
+		umount_tree /oldroot
+		umount_tree /run/overlay/
 	fi
 }

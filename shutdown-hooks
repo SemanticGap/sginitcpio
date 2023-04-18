@@ -19,8 +19,14 @@ run_hookfunctions() {
     done
 }
 
+# parse the kernel command line
+parse_cmdline </proc/cmdline
+
+# collect the hooks
 SHUTDOWN_HOOKS=$(echo $EARLYHOOKS $HOOKS $LATEHOOKS $CLEANUPHOOKS | sed -e 's: \+:\n:g' | sort | uniq)
 export SHUTDOWN_HOOKS
+
+# Run the hooks
 
 if grep -e 'break=\(y\|\(pre\)\?shutdown\)' /proc/cmdline > /dev/null; then
     echo ":: Pre-shutdown break requested, type 'exit' to resume operation"
@@ -34,4 +40,5 @@ if grep -e 'break=\(y\|\(post\)\?shutdown\)' /proc/cmdline > /dev/null; then
     launch_interactive_shell
 fi
 
+# Finalize shutdown
 exec /shutdown.orig $@
