@@ -5,6 +5,7 @@ build()
   add_module overlay
   add_module squashfs
   add_module isofs
+  add_module loop
   add_runscript
 }
 
