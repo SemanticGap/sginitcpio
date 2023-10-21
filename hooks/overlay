@@ -23,16 +23,15 @@ run_latehook() {
 	if [[ "${overlay_upper}" != 'none' ]]; then
 		msg "Checking overlay ${overlay_upper}"
 		[ ! -e "${overlay_upper}" ] && overlay_upper="$(resolve_device "${overlay_upper}")"
-		if [ -b "${overlay_upper}" ] && ! fsck_device "${overlay_upper}"; then
+		if [[ "${overlay_upper_fsck}" != '0' ]] && [ -b "${overlay_upper}" ] && ! fsck_device "${overlay_upper}"; then
 			err "Failed to fsck overlay root: ${overlay_upper}"
-			launch_interactive_shell --exec
 		fi
 	fi
 
 	msg "Mounting overlay ${overlay_upper}"
 	if ! mount -t "${overlay_upper_type:-auto}" -o "${overlay_upper_options:-rw}" "${overlay_upper}" ${OVERLAY_MNT_ROOT}/rw ; then
 		err "Failed to mount overlay root ${overlay_upper}"
-		launch_interactive_shell --exec
+		launch_interactive_shell
 	fi
 
 	[ ! -d ${OVERLAY_MNT_ROOT}/rw/data ] && mkdir ${OVERLAY_MNT_ROOT}/rw/data
@@ -42,7 +41,7 @@ run_latehook() {
 	[[ "${overlay_options}" != "" ]] && OVERLAY_OPTS="${overlay_options},${OVERLAY_OPTS}"
 	if ! mount -t overlay none /new_root -o "${OVERLAY_OPTS}" ; then
 		err "Overlay failed to mount."
-		launch_interactive_shell --exec
+		launch_interactive_shell
 	fi
 }
 
