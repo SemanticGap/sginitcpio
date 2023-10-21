@@ -30,7 +30,8 @@ run_latehook() {
 
 	msg "Mounting overlay ${overlay_upper}"
 	if ! mount -t "${overlay_upper_type:-auto}" -o "${overlay_upper_options:-rw}" "${overlay_upper}" ${OVERLAY_MNT_ROOT}/rw ; then
-		err "Failed to mount overlay root ${overlay_upper}"
+                run_hookfunctions 'run_emergencyhook' 'emergency hook' $EMERGENCYHOOKS
+		err "Failed to mount overlay root ${overlay_upper} at ${OVERLAY_MNT_ROOT}/rw"
 		launch_interactive_shell
 	fi
 
@@ -40,7 +41,8 @@ run_latehook() {
 	OVERLAY_OPTS="index=off,lowerdir=${OVERLAY_MNT_ROOT}/ro,upperdir=${OVERLAY_MNT_ROOT}/rw/data,workdir=${OVERLAY_MNT_ROOT}/rw/work"
 	[[ "${overlay_options}" != "" ]] && OVERLAY_OPTS="${overlay_options},${OVERLAY_OPTS}"
 	if ! mount -t overlay none /new_root -o "${OVERLAY_OPTS}" ; then
-		err "Overlay failed to mount."
+                run_hookfunctions 'run_emergencyhook' 'emergency hook' $EMERGENCYHOOKS
+		err "Overlay failed to mount: mount -t overlay none /new_root -o \"${OVERLAY_OPTS}\""
 		launch_interactive_shell
 	fi
 }
