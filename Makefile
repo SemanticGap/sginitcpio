@@ -1,5 +1,5 @@
 NAME=semgap-initcpio
-VERSION=0.5
+VERSION=0.6
 
 .PHONY: clean release install
 
