@@ -1,5 +1,5 @@
 NAME=semgap-initcpio
-VERSION=0.6
+VERSION=0.7
 
 .PHONY: clean release install
 
@@ -17,15 +17,16 @@ install:
 	install -d $(DESTDIR)/usr/lib/initcpio
 	install -d $(DESTDIR)/usr/lib/initcpio/hooks
 	install -d $(DESTDIR)/usr/lib/initcpio/install
-	install hooks/overlay $(DESTDIR)/usr/lib/initcpio/hooks/overlay
-	install install/overlay $(DESTDIR)/usr/lib/initcpio/install/overlay
-	install install/fs-extra $(DESTDIR)/usr/lib/initcpio/install/fs-extra
-	install hooks/livecd $(DESTDIR)/usr/lib/initcpio/hooks/livecd
-	install install/livecd $(DESTDIR)/usr/lib/initcpio/install/livecd
-	install hooks/shutdown-hooks $(DESTDIR)/usr/lib/initcpio/hooks/shutdown-hooks
-	install install/shutdown-hooks $(DESTDIR)/usr/lib/initcpio/install/shutdown-hooks
-	install shutdown-hooks $(DESTDIR)/usr/lib/initcpio/shutdown-hooks
+	install -m 0755 hooks/overlay $(DESTDIR)/usr/lib/initcpio/hooks/overlay
+	install -m 0755 install/overlay $(DESTDIR)/usr/lib/initcpio/install/overlay
+	install -m 0755 install/fs-extra $(DESTDIR)/usr/lib/initcpio/install/fs-extra
+	install -m 0755 hooks/livecd $(DESTDIR)/usr/lib/initcpio/hooks/livecd
+	install -m 0755 install/livecd $(DESTDIR)/usr/lib/initcpio/install/livecd
+	install -m 0755 hooks/shutdown-hooks $(DESTDIR)/usr/lib/initcpio/hooks/shutdown-hooks
+	install -m 0755 install/shutdown-hooks $(DESTDIR)/usr/lib/initcpio/install/shutdown-hooks
+	install -m 0755 shutdown-hooks $(DESTDIR)/usr/lib/initcpio/shutdown-hooks
 	install -d $(DESTDIR)/etc/mkinitcpio.d
-	install etc/mkinitcpio.conf $(DESTDIR)/etc/mkinitcpio.conf.sg
-	install etc/mkinitcpio.d/linux.preset $(DESTDIR)/etc/mkinitcpio.d/sglinux.preset
+	install -m 0644 etc/mkinitcpio.conf $(DESTDIR)/etc/mkinitcpio.conf.sg
+	install -m 0644 etc/mkinitcpio.d/linux.preset $(DESTDIR)/etc/mkinitcpio.d/sglinux.preset
+	install -Dm 0644 etc/kernel/livecd-cmdline.conf $(DESTDIR)/etc/kernel/livecd-cmdline.conf
 

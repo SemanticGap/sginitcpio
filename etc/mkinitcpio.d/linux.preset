@@ -3,12 +3,24 @@
 ALL_config="/etc/mkinitcpio.conf.sg"
 ALL_kver="/boot/vmlinuz-linux"
 
-PRESETS=('default' 'fallback')
+PRESETS=('default' 'fallback' 'livecd' 'livecd_lite')
 
 #default_config="/etc/mkinitcpio.conf"
 default_image="/boot/sg-initramfs-linux.img"
-#default_options=""
+default_uki="/boot/EFI/sglinux/sglinux.efi"
+default_options=""
 
 #fallback_config="/etc/mkinitcpio.conf"
 fallback_image="/boot/sg-initramfs-linux-fallback.img"
+fallback_uki="/boot/EFI/sglinux/sglinux-fallback.efi"
 fallback_options="-S autodetect"
+
+#livecd_config="/etc/mkinitcpio.conf"
+livecd_image="/boot/sg-initramfs-linux-livecd.img"
+livecd_uki="/boot/EFI/sglinux/sglinux-livecd.efi"
+livecd_options="--cmdline /etc/kernel/livecd-cmdline.conf"
+
+#livecd_lite_config="/etc/mkinitcpio.conf"
+livecd_lite_image="/boot/sg-initramfs-linux-livecd-lite.img"
+livecd_lite_uki="/boot/EFI/sglinux/sglinux-livecd-lite.efi"
+livecd_lite_options="-S autodetect --cmdline /etc/kernel/livecd-cmdline.conf"
