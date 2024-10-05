@@ -1,5 +1,5 @@
 NAME=semgap-initcpio
-VERSION=0.7
+VERSION=0.8
 
 .PHONY: clean release install
 
@@ -27,6 +27,6 @@ install:
 	install -m 0755 shutdown-hooks $(DESTDIR)/usr/lib/initcpio/shutdown-hooks
 	install -d $(DESTDIR)/etc/mkinitcpio.d
 	install -m 0644 etc/mkinitcpio.conf $(DESTDIR)/etc/mkinitcpio.conf.sg
-	install -m 0644 etc/mkinitcpio.d/linux.preset $(DESTDIR)/etc/mkinitcpio.d/sglinux.preset
+	install -m 0644 etc/mkinitcpio.d/sglinux.preset $(DESTDIR)/etc/mkinitcpio.d/sglinux.preset
+	install -m 0644 etc/mkinitcpio.d/sglinux-lts.preset $(DESTDIR)/etc/mkinitcpio.d/sglinux-lts.preset
 	install -Dm 0644 etc/kernel/livecd-cmdline.conf $(DESTDIR)/etc/kernel/livecd-cmdline.conf
-
