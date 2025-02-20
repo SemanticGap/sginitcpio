@@ -1,4 +1,31 @@
 #!/bin/sh
+#
+# This hook is used to discover and mount the block device containing a file
+# containing a root file system as is found on live CD ISOs.
+# 
+# Input boot arguments and their defaults:
+#
+#                  livecd=cdrom  More a flag to search for a livecd, but
+#                                hints on where to find ~livecd_device~.
+#                livecd_device=  Preferred block device containing the LiveCD.
+#                    livecd_rw=  Set to mount the livecd medium read/write.
+#   livecd_file=livecd.squashfs  File name containing the root file system.
+#            overlay_upper=none  Block device for persistent storage.
+#      overlay_upper_type=tmpfs  File system type for the storage.
+#
+# The hook mounts the block device at $LIVECD_ROOT and exports for the normal
+# root file system mount process:
+#
+#                 root  The path to the file containing the root file system.
+#            rootflags  Flags to mount the root file system.
+#               CDROOT  The path to where the source medium was mounted.
+#             NEW_ROOT  Where the root file system was mounted.
+#        overlay_upper  ~none~ unless customized.
+#   overlay_upper_type ~tmpfs~ unless customized.
+#
+# Once the file system is mounted, any ~cdupdate.sh~ script will be ran and
+# a ~.updated~ file will be created.
+#
 
 LIVECD_ROOT=/run/livecd
 
@@ -10,13 +37,19 @@ block_devices()
 find_livecd()
 {
 	local DEV="$1"
-	[[ "${DEV}" == *=* ]] && DEV=$(resolve_device "${DEV}")
+	[[ "${DEV}" == "*=*" ]] && DEV=$(resolve_device "${DEV}")
 	
 	mkdir -p ${LIVECD_ROOT}
 
 	for dev in $(echo $DEV; block_devices); do
-		mount -o ro /dev/$dev ${LIVECD_ROOT} 2>/dev/null || continue
-		[ -e ${LIVECD_ROOT}/${livecd_file:-livecd.squashfs} ] && echo /dev/$dev && break
+		if [[ "${dev}" != "/*" ]]; then
+			dev="/dev/$dev"
+		fi
+		mount -o ro "${dev}" ${LIVECD_ROOT} 2>/dev/null || continue
+		if [ -e ${LIVECD_ROOT}/${livecd_file:-livecd.squashfs} ]; then
+			echo "${dev}"
+			break
+		fi
 		umount ${LIVECD_ROOT}
 	done
 }
@@ -25,10 +58,20 @@ run_hook()
 {
 	[[ "${livecd}" == '' ]] && return 0
 	# find livecd device
-	local LIVECD_DEV="${livecd_device:-$(find_livecd "${livecd:-cdrom}")}"
-	[[ "${LIVECD_DEV}" == '' ]] && err "LiveCD not found." && return 1
-	# set file with root file system to root
-	msg "Found LiveCD on ${LIVECD_DEV}"
+	local LIVECD_DEV="${livecd_device}"
+	if [ -e "/ventoy/busybox/sh" ] && [ -e "/ventoy/hook/arch/ventoy-disk.sh" ]; then
+		/ventoy/busybox/sh /ventoy/hook/arch/ventoy-disk.sh
+		echo Y > /ventoy/hook_finish
+	fi
+	[[ "${LIVECD_DEV}" == '' ]] && LIVECD_DEV="$(find_livecd "${livecd:-cdrom}")"
+	if [[ "${LIVECD_DEV}" == '' ]]; then
+		run_hookfunctions 'run_emergencyhook' 'emergency hook' $EMERGENCYHOOKS
+		err "LiveCD not found."
+        	launch_interactive_shell
+	fi
+
+  	# set file with root file system to root
+	msg "Using LiveCD on ${LIVECD_DEV:-${LIVECD_ROOT}}"
 	[[ "${livecd_rw}" != "" ]] && mount -o remount,rw "${LIVECD_ROOT}"
 	export root="${LIVECD_ROOT}/${livecd_file:-livecd.squashfs}"
 	# fall into overlay setup
@@ -42,6 +85,7 @@ run_cleanuphook()
 	if [ -e "${CDROOT_PATH}"/cdupdate.sh ] && [ ! -e "/new_root/.updated" ]; then
 		export CDROOT_PATH
 		export NEW_ROOT=/new_root
+		msg "Executing ${CDROOT_PATH}/cdupdate.sh"
 		"${CDROOT_PATH}"/cdupdate.sh
 	fi
 }

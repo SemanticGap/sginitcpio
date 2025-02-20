@@ -1,4 +1,25 @@
 #!/bin/sh
+#
+# This hook mounts a file system that is overlayed over the root file system
+# already mounted at ~/new_root~. This is useful for live CDs, testing, and
+# any where else temporary changes and/or unmodifiable root file systems
+# are needed.
+#
+# Input boot arguments:
+#
+#           overlay_upper  The block device containing the overlay file system.
+#                          ~none~ creates a tmpfs.
+#      overlay_upper_type  The file system type of the overlay file system.
+#   overlay_upper_options  Any mount options for the overlay.
+#
+# File systems are mounted to:
+#
+#   /run/overlay/ro  The source file system.
+#   /run/overlay/rw  The overlay file system.
+#         /new_root  The complete file system
+#
+# Upon system shutdown the file systems are unmounted in the reverse order.
+#
 
 OVERLAY_MNT_ROOT="/run/overlay"
 
